@@ -1,6 +1,6 @@
 import java.util.*;
 
-public class Q10_B_SJF_Preemptive {
+public class SJFPreemptive {
     public static void main(String[] args) {
         // taking no.of processes , arrival time and burst time from user
         Scanner sc = new Scanner(System.in);
@@ -67,11 +67,11 @@ public class Q10_B_SJF_Preemptive {
             waitingTimes[i] = turnaroundTimes[i] - burstTimes[i];
         }
 
-        // Pretty Printing
-        System.out.println("Process \t\t Arrival Time \t\t Burst Time \t\t Finish Time \t\t Turnaround Time \t\t Waiting Time \t\t");
-        for(int i = 0; i < processes; i++){
-            System.out.printf("P%d\t\t\t\t\t%d\t\t\t\t\t%d\t\t\t\t\t%d\t\t\t\t\t%d\t\t\t\t\t\t%d\t\t\t\t\t" , i,arrivalTimes[i],burstTimes[i],finishTimes[i],turnaroundTimes[i],waitingTimes[i]);
-            System.out.println();
+         // Print the results
+        System.out.println("Process \t Arrival Time \t Burst Time \t Finish Time \t Turnaround Time \t Waiting Time");
+        for (int i = 0; i < processes; i++) {
+            System.out.printf("P%d\t\t %d\t\t %d\t\t %d\t\t\t %d\t\t %d\n",
+                    i, arrivalTimes[i], burstTimes[i], finishTimes[i], turnaroundTimes[i], waitingTimes[i]);
         }
 
     }
