@@ -1,81 +1,70 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
-#include <semaphore.h>
 #include <unistd.h>
 
-#define NUM_PHILOSOPHERS 3
-#define MAX_MEALS 1 // Number of times each philosopher will eat
+#define NUM_PHILOSOPHERS 5
 
-sem_t forks[NUM_PHILOSOPHERS];
-pthread_mutex_t lock;
-int meal_count[NUM_PHILOSOPHERS] = {0}; // Tracks meals for each philosopher
+pthread_mutex_t forks[NUM_PHILOSOPHERS];
 
-void *philosopher(void *arg)
-{
-    int id = *((int *)arg);
-    int left = id;
-    int right = (id + 1) % NUM_PHILOSOPHERS;
-
-    while (meal_count[id] < MAX_MEALS)
-    {
-        // Thinking
+// Function representing the philosopher's actions
+void* philosopher(void* num) {
+    int id = *(int*)num;
+    int count = 0;
+    while (count<3) {
+        // Think
         printf("Philosopher %d is thinking.\n", id);
-        sleep(1);
+        //usleep(rand() % 1000);
 
-        // Picking up forks
-        pthread_mutex_lock(&lock);
-        sem_wait(&forks[left]);
-        sem_wait(&forks[right]);
-        pthread_mutex_unlock(&lock);
+        // Pick up left fork
+        pthread_mutex_lock(&forks[id]);
+        printf("Philosopher %d picked up left fork.\n", id);
 
-        // Eating
+        // Pick up right fork
+        pthread_mutex_lock(&forks[(id + 1) % NUM_PHILOSOPHERS]);
+        printf("Philosopher %d picked up right fork.\n", id);
+
+        // Eat
         printf("Philosopher %d is eating.\n", id);
-        sleep(2); // Eating time
-        meal_count[id]++;
-        printf("Philosopher %d finished eating (%d/%d times).\n", id, meal_count[id], MAX_MEALS);
+        //usleep(rand() % 1000);
 
-        // Putting down forks
-        sem_post(&forks[left]);
-        sem_post(&forks[right]);
+        // Put down right fork
+        pthread_mutex_unlock(&forks[(id + 1) % NUM_PHILOSOPHERS]);
+        printf("Philosopher %d put down right fork.\n", id);
+
+        // Put down left fork
+        pthread_mutex_unlock(&forks[id]);
+        printf("Philosopher %d put down left fork.\n", id);
+        count++;
     }
 
-    printf("Philosopher %d is done eating and leaving.\n", id);
     return NULL;
 }
 
-int main()
-{
+int main() {
     pthread_t philosophers[NUM_PHILOSOPHERS];
     int ids[NUM_PHILOSOPHERS];
 
-    // Initialize semaphores and mutex
-    for (int i = 0; i < NUM_PHILOSOPHERS; i++)
-    {
-        sem_init(&forks[i], 0, 1);
+    // Initialize mutexes
+    for (int i = 0; i < NUM_PHILOSOPHERS; i++) {
+        pthread_mutex_init(&forks[i], NULL);
+        ids[i] = i; // assign philosopher id
     }
-    pthread_mutex_init(&lock, NULL);
 
     // Create philosopher threads
-    for (int i = 0; i < NUM_PHILOSOPHERS; i++)
-    {
-        ids[i] = i;
+    for (int i = 0; i < NUM_PHILOSOPHERS; i++) {
         pthread_create(&philosophers[i], NULL, philosopher, &ids[i]);
     }
 
-    // Wait for all philosophers to finish
-    for (int i = 0; i < NUM_PHILOSOPHERS; i++)
-    {
+    // Join philosopher threads (this will never happen due to the infinite loop)
+    for (int i = 0; i < NUM_PHILOSOPHERS; i++) {
         pthread_join(philosophers[i], NULL);
     }
 
-    // Cleanup
-    for (int i = 0; i < NUM_PHILOSOPHERS; i++)
-    {
-        sem_destroy(&forks[i]);
+    // Destroy mutexes (not reached because of infinite loop)
+    for (int i = 0; i < NUM_PHILOSOPHERS; i++) {
+        pthread_mutex_destroy(&forks[i]);
     }
-    pthread_mutex_destroy(&lock);
 
-    printf("All philosophers have finished eating.\n");
     return 0;
 }
