@@ -38,6 +38,24 @@ factorial() {
 read -p "Enter a number: " num
 factorial $num
 
+# Recursion
+factorial() {
+    local n=$1
+
+    if [ $n -le 1 ]; then
+        echo 1
+    else
+        # Recursive case: n * factorial(n-1)
+        local temp=$((n - 1))
+        local result=$(factorial $temp)
+        echo $((n * result))
+    fi
+}
+
+# Example usage
+factorial "5"
+
+
 // Bubble sort
 #!/bin/bash
 
@@ -63,6 +81,8 @@ bubble_sort() {
 # Read input from user
 read -p "Enter numbers to sort (space-separated): " -a numbers
 bubble_sort "${numbers[@]}"
+
+
 
 
 #!/bin/bash
@@ -91,3 +111,16 @@ insertion_sort() {
 # Read input from user
 read -p "Enter numbers to sort (space-separated): " -a numbers
 insertion_sort "${numbers[@]}"
+
+
+#!/bin/bash
+
+string="Hello, welcome to OpenAI!"
+substring="welcome"
+
+if echo "$string" | grep -q "$substring"; then
+    echo "Substring found!"
+else
+    echo "Substring not found."
+fi
+
