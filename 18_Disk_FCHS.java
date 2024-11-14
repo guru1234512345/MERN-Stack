@@ -51,3 +51,12 @@ public class FCFS_DISK_SH {
         System.out.println("\nTotal seek time : "+tst);
     }
 }
+200
+5
+82
+170
+43
+140
+24
+50
+2
